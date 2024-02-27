@@ -20,7 +20,7 @@ In order to automate secrets provisioning these templates generates Custom Resou
 
 ## Sandbox cluster setup with Developer Hub and Hashicorp Vault
 
-You can setup a `RHDH + Hashicorp Vault` environment on your **sandbox cluster** using [**this repo here**]( https://github.com/redhat-na-ssa/redhat-developer-hub-gitops-bootstrap.git ). This repo contains a ArgoCD app which install all the components needed to use these software templates. I also contains a Ansible playbook to install RHDH and configure Vault.
+You can setup a `RHDH + Hashicorp Vault` environment on your **sandbox cluster** using [**this repo here**]( https://github.com/alexgroom/redhat-developer-hub-gitops-bootstrap.git ). This repo contains a ArgoCD app which install all the components needed to use these software templates. I also contains a Ansible playbook to install RHDH and configure Vault.
 
 ## Using templates without Secret Management
 
