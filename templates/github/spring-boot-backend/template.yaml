@@ -281,6 +281,7 @@ spec:
         #     - "team_name"
         #Protect the default branch after creating the repository. The default value is 'true'
         protectDefaultBranch: false
+        repoVisibility: public
 
     - id: register
       name: Registering the Catalog Info Component
