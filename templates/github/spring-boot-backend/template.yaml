@@ -173,7 +173,8 @@ spec:
                   title: Cluster Domain Url
                   type: string
                   description: The Cluster Domain URL where the aplication will be deployed to (usually starts with '.apps')
-                  default: 'apps.cluster-domain.com (REPLACE-ME!!!)'
+                  # REPLACE-ME
+                  default: 'apps.cluster-2tgsr.dynamic.redhatworkshops.io'
                 namespace:
                   title: Project Namespace
                   type: string
@@ -281,7 +282,6 @@ spec:
         #     - "team_name"
         #Protect the default branch after creating the repository. The default value is 'true'
         protectDefaultBranch: false
-        repoVisibility: public
 
     - id: register
       name: Registering the Catalog Info Component
