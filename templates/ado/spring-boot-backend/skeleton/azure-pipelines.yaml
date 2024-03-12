@@ -1,0 +1,61 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  - repo: self
+
+variables:
+  tag: "$(Build.BuildId)"
+
+
+steps:    
+- task: Maven@4
+  inputs:
+    mavenPomFile: '$(Build.SourcesDirectory)/pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17'
+    jdkArchitectureOption: 'x64'
+    goals: 'clean package'
+    options: -e -B -DskipTests
+
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+- task: Docker@2
+  displayName: Login to quay
+  inputs:
+    command: login
+    containerRegistry: quayioConnection
+
+- task: Docker@2
+  displayName: Build an image
+  inputs:
+    command: buildAndPush
+    buildContext: .
+    dockerfile: "$(Build.SourcesDirectory)/src/main/docker/Dockerfile.jvm"
+    containerRegistry: quayioConnection
+    repository: ${{ values.imageOrganization }}/${{ values.imageName}}
+    tags: |
+      $(tag)
+      
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'OpenShiftRHDevSandbox'
+    cmd: 'oc new-app --image=${{ values.imageHost }}/${{ values.imageOrganization }}/${{ values.imageName}}:$(tag) --name=${{ values.name }}'
+
+- task: oc-cmd@3
+  inputs:
+    connectionType: 'OpenShift Connection Service'
+    openshiftService: 'OpenShiftRHDevSandbox'
+    cmd: 'oc expose service/${{ values.name }}'    

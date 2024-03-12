@@ -10,3 +10,4 @@ spec:
     - https://github.com/redhat-na-ssa/software-templates/blob/main/templates/github/spring-boot-backend/template.yaml
     - https://github.com/redhat-na-ssa/software-templates/blob/main/templates/github/quarkus-web-template/template.yaml
     - https://github.com/redhat-na-ssa/software-templates/blob/main/templates/github/techdocs/template.yaml
+    
