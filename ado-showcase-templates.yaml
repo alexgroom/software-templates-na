@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: redhat-na-ssa-rhdh-gpt-collection
+  description: A (demo) collection of Backstage Golden Path Templates for Red Hat Developer Hub
+spec:
+  type: url
+  targets:
+    - https://dev.azure.com/agroom0680/_git/software-templates?path=/templates/ado/spring-boot-backend/template.yaml&version=GBmain
+   # - https://dev.azure.com/agroom0680/_git/software-templates?path=/templates/ado/quarkus-web-template/template.yaml&version=GBmain
+    - https://dev.azure.com/agroom0680/_git/software-templates?path=/templates/ado/dotnet-frontend/template.yaml&version=GBmain
