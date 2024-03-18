@@ -1,0 +1,92 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: quarkus-build
+  namespace: ${{values.namespace}}
+spec:
+  triggers:
+    - type: ConfigChange
+  runPolicy: Serial
+  source:
+    type: None
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        def mvnCmd = "mvn"
+        pipeline {
+                    agent {
+                      label 'maven'
+                    }
+                    stages {
+                      stage('Build setup') {
+                        steps {
+                          script {
+                            try {
+                                openshift.withCluster() {
+                                  openshift.withProject("${{values.namespace}}") {
+                                    def nb = openshift.newBuild(""--name=${{values.component_id}}"", '--binary=true', '--image-stream=java:11')
+                                    echo "newBuild created: ${nb.count()} objects : ${nb.names()}"
+                                  }
+                                }
+                            }
+                            catch (exc) {
+                                echo 'build setup failed but continuing'
+                            }
+                          }
+                        }
+                      }
+                      stage('Build Quarkus uber-jar App') {
+                        steps {
+                          git branch: 'main', url: "${{values.source_repository}}"
+                          sh "${mvnCmd} install -DskipTests=true -Dquarkus.package.type=uber-jar"
+                        }
+                      }
+        //              stage('Test') {
+        //                steps {
+        //                  sh "${mvnCmd} test"
+        //                  step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
+        //                }
+        //              }
+        //              stage('Code Analysis') {
+        //                steps {
+        //                  script {
+        //                    sh "${mvnCmd} install sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -DskipTests=true"
+        //                  }
+        //                }
+        //              }
+        //              stage('Archive App') {
+        //                steps {
+        //                  sh "${mvnCmd} deploy -DskipTests=true -P nexus3"
+        //                }
+        //              }
+                      stage('Build Quarkus Image') {
+                        steps {
+                          script {
+                            openshift.withCluster() {
+                              openshift.withProject("${{values.namespace}}") {
+                                openshift.selector("bc", "${{values.component_id}}").startBuild("--from-file=target/quarkus-app-1.0-SNAPSHOT-runner.jar", "--wait=true")
+                            }
+                          }
+                        }
+                      }
+                      stage('Deploy setup') {
+                        steps {
+                          script {
+                            openshift.withCluster() {
+                              openshift.withProject("${{values.namespace}}") {
+                                echo 'Execute deployment yaml'
+                                def na = openshift.apply('-f deployment.yaml')
+                                echo "created: ${na.count()} objects : ${na.names()}"                            
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+        }
+  output: {}
+  resources: {}
+  postCommit: {}
+  nodeSelector: null
