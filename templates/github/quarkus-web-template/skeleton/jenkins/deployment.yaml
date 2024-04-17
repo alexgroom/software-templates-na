@@ -9,6 +9,7 @@ items:
       app.kubernetes.io/component: ${{values.component_id}}
       app.kubernetes.io/instance: ${{values.component_id}}
       app.kubernetes.io/name: ${{values.component_id}}
+      backstage.io/kubernetes-id: ${{values.component_id}}
     name: ${{values.component_id}}
   spec:
     replicas: 1
@@ -21,6 +22,7 @@ items:
         creationTimestamp: null
         labels:
           deployment: ${{values.component_id}}
+          backstage.io/kubernetes-id: ${{values.component_id}}
       spec:
         containers:
         - image: ' '
@@ -43,6 +45,7 @@ items:
       app.kubernetes.io/component: ${{values.component_id}}
       app.kubernetes.io/instance: ${{values.component_id}}
       app.kubernetes.io/name: ${{values.component_id}}
+      backstage.io/kubernetes-id: ${{values.component_id}}
     name: ${{values.component_id}}
   spec:
     ports:
@@ -71,6 +74,7 @@ items:
       app.kubernetes.io/component: ${{values.component_id}}
       app.kubernetes.io/instance: ${{values.component_id}}
       app.kubernetes.io/name: ${{values.component_id}}
+      backstage.io/kubernetes-id: ${{values.component_id}}
     name: ${{values.component_id}}
   spec:
     port:
