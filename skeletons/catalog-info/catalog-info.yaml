@@ -25,6 +25,9 @@ metadata:
     {%- endif %}
     argocd/app-name: ${{ values.artifactId }}-dev
     backstage.io/kubernetes-id: ${{ name }}
+    {%- if values.namespace %}
+    backstage.io/kubernetes-namespace: ${{ values.namespace }}
+    {%- endif %}
     backstage.io/techdocs-ref: dir:.
     {%- if values.sourceControl == "gitlab.com" %}
     gitlab.com/project-slug: ${{ values.orgName }}/${{ values.repoName }}
