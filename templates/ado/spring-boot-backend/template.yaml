@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: spring-boot-backend-template
-  title: Create a Spring Boot Backend application with CI (Tekton) and CD (ArgoCD) manifests 
+  title: Create a Spring Boot Backend application with CI (Azure Pipelines) and CD (Azure) manifests 
   description: Create a starter Spring Boot backend application with a CI pipeline
   tags:
     - recommended
@@ -10,7 +10,7 @@ metadata:
     - java
     - maven
 spec:
-  owner: janus-authors
+  owner: alexgroom
   system: janus-idp
   type: service
 
@@ -90,54 +90,6 @@ spec:
           type: string
           default: com/redhat/demos
           description: Name for the Java Package (ensure to use the / character as this is used for folder structure) should match Group ID and Artifact ID
-    - title: Does the App provides an API?
-      required:
-        - providesApi
-        - apiType
-        - apiSwaggerUI
-        - apiSpecFileUrl
-      properties:
-        providesApi:
-          title: 'Choose'
-          type: boolean
-          default: false
-          ui:widget: radio
-      dependencies:
-        providesApi:
-          oneOf:
-            - properties:
-                providesApi:
-                  enum:
-                    - false
-            - properties:
-                providesApi:
-                  enum:
-                    - true
-                apiType:
-                  title: API Type
-                  type: string
-                  description: The Url for the OpenApi spec file endpoint
-                  default: openapi
-                  enum:
-                    - openapi
-                    - asyncapi
-                    - graphql
-                    - grpc
-                  enumNames:
-                    - OpenAPI
-                    - AsyncAPI
-                    - GraphQL
-                    - gRPC
-                apiSwaggerUI:
-                  title: Swagger UI URL
-                  type: string
-                  description: The Url for the API spec file endpoint
-                  default: 'https://REPLACE-ME/swagger-ui.html'
-                apiSpecFileUrl:
-                  title: API Spec URL
-                  type: string
-                  description: The Url for the OpenApi spec file endpoint
-                  default: 'https://REPLACE-ME/v3/api-doc.yaml'
     - title: Provide information about the CI method
       required:
         - ci
@@ -157,7 +109,7 @@ spec:
             #- ./skeletons/tekton/
           enumNames:
             - GitHub Action
-            - Tekton
+            - Azure pipelines
       dependencies:
         ci:
           oneOf:
@@ -183,8 +135,8 @@ spec:
                 namespace:
                   title: Project Namespace
                   type: string
-                  description: The Project Namespace for deploying resources to the cluster.
-                  default: my-springboot-app
+                  description: The Project for Deploying resources to the cluster.
+                  default: agroom-dev
                 ci:
                   const: ../../../skeletons/tekton/
                   #use this 'url' while testing on the Template Editor UI
@@ -220,6 +172,7 @@ spec:
                           title: Registry Organization
                           type: string
                           description: Name of the Quay Organization
+                          default: rhdh1
 
   steps:
     - id: sourceCodeTemplate
@@ -262,7 +215,7 @@ spec:
           system: ${{ parameters.system }}
           applicationType: service
           description: ${{ parameters.description }}
-          namespace: ${{ parameters.namespace }}-dev
+          namespace: ${{ parameters.namespace }}
           ci: ${{ parameters.ci }}
           artifactId: ${{ parameters.artifactId }}
           sourceControl: dev.azure.com # If using a Hosted Enterprise GithHub replace with your internal domain
@@ -271,10 +224,6 @@ spec:
           imageOrganization: ${{ parameters.image_organization }}
           imageName: ${{ parameters.artifactId }}
           clusterDomainUrl: ${{ parameters.cluster_domain_url }}
-          providesApi: ${{ parameters.providesApi }}
-          apiType: ${{ parameters.apiType }}
-          apiSwaggerUI: ${{ parameters.apiSwaggerUI }}
-          apiSpecFileUrl: ${{ parameters.apiSpecFileUrl }}
           projectName: ${{ parameters.projectName }}
 
     - id: publish
@@ -285,7 +234,7 @@ spec:
         description: ${{ parameters.description }}
         # If using a Hosted Enterprise GithHub replace with your internal domain
         # dev.azure.com, Opens in a new window?owner=software-templates&repo=sb2&organization=agroom0680"
-        repoUrl: dev.azure.com?organization=${{ parameters.orgName }}&owner=${{ parameters.projectName }}&repo=${{ parameters.repoName }}
+        repoUrl: dev.azure.com?organization=${{ parameters.orgName }}&owner=${{ parameters.projectName }}&repo=${{ parameters.repoName }}&project=${{ parameters.projectName }}
         defaultBranch: main
         #Allow specific users, teams, or apps to bypass pull request requirements.
         # bypassPullRequestAllowances:

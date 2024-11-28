@@ -46,16 +46,14 @@ steps:
     containerRegistry: quayioConnection
     repository: ${{ values.imageOrganization }}/${{ values.imageName}}
     tags: |
-      $(tag)
-      
-- task: oc-cmd@3
-  inputs:
-    connectionType: 'OpenShift Connection Service'
-    openshiftService: 'OpenShiftRHDevSandbox'
-    cmd: 'oc new-app --image=${{ values.imageHost }}/${{ values.imageOrganization }}/${{ values.imageName}}:$(tag) --name=${{ values.name }}'
+      $(tag),latest
 
-- task: oc-cmd@3
+- task: Kubernetes@1
   inputs:
-    connectionType: 'OpenShift Connection Service'
-    openshiftService: 'OpenShiftRHDevSandbox'
-    cmd: 'oc expose service/${{ values.name }}'    
+    connectionType: 'Kubernetes Service Connection'
+    kubernetesServiceEndpoint: 'DeployToDevSandbox'
+    namespace: 'agroom-dev'
+    # This namespace is limited by the serviceAccount role bindings, currently the SA is limited to just this project
+    command: 'apply'
+    arguments: '-f deployment.yaml --validate=ignore'
+

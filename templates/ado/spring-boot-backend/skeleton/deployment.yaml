@@ -1,0 +1,90 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${{values.name}}
+      app.kubernetes.io/component: ${{values.name}}
+      app.kubernetes.io/instance: ${{values.name}}
+      app.kubernetes.io/name: ${{values.name}}
+      backstage.io/kubernetes-id: ${{values.name}}
+      app.openshift.io/runtime: spring-boot
+    name: ${{values.name}}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        deployment: ${{values.name}}
+    strategy: {}
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          deployment: ${{values.name}}
+          backstage.io/kubernetes-id: ${{values.name}}
+      spec:
+        containers:
+        - image: ${{ values.imageHost}}/${{ values.imageOrganization }}/${{values.name}}:latest
+          name: ${{values.name}}
+          ports:
+          - containerPort: ${{values.port}}
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          imagePullPolicy: Always
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${{values.name}}
+      app.kubernetes.io/component: ${{values.name}}
+      app.kubernetes.io/instance: ${{values.name}}
+      app.kubernetes.io/name: ${{values.name}}
+      backstage.io/kubernetes-id: ${{values.name}}
+    name: ${{values.name}}
+  spec:
+    ports:
+    - name: ${{values.port}}-tcp
+      port: ${{values.port}}
+      protocol: TCP
+      targetPort: ${{values.port}}
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: 8778-tcp
+      port: 8778
+      protocol: TCP
+      targetPort: 8778
+    selector:
+      deployment: ${{values.name}}
+  status:
+    loadBalancer: {}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${{values.name}}
+      app.kubernetes.io/component: ${{values.name}}
+      app.kubernetes.io/instance: ${{values.name}}
+      app.kubernetes.io/name: ${{values.name}}
+      backstage.io/kubernetes-id: ${{values.name}}
+    name: ${{values.name}}
+  spec:
+    port:
+      targetPort: ${{values.port}}-tcp
+    to:
+      kind: ""
+      name: ${{values.name}}
+      weight: null
+  status: {}
+kind: List
+metadata: {}
